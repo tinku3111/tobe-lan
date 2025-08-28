@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TOBE Playground</title>
+  <style>
+    :root{--bg:#0f1724;--card:#111827;--muted:#94a3b8;--accent:#60a5fa;--panel:#0b1320}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{background:linear-gradient(180deg,#071029 0%,#02111a 100%);color:#e6eef8}
+    .wrap{max-width:1200px;margin:24px auto;padding:20px}
+    header{display:flex;align-items:center;gap:16px}
+    h1{margin:0;font-size:20px}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:16px;margin-top:18px}
+    .card{background:rgba(255,255,255,0.03);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    textarea{width:100%;height:520px;background:#020617;color:#dbeafe;border:1px solid rgba(255,255,255,0.04);padding:12px;border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;font-size:13px}
+    .controls{display:flex;gap:10px;margin-top:8px}
+    button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#022;cursor:pointer;font-weight:600}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    pre{background:#021224;padding:12px;border-radius:8px;overflow:auto;min-height:200px;color:#dbeafe}
+    .doc{font-size:13px;color:var(--muted);line-height:1.5}
+    .section{margin-bottom:12px}
+    .footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+    .row{display:flex;gap:8px;align-items:center}
+    .hint{font-size:12px;color:var(--muted)}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .sample-list{display:flex;flex-direction:column;gap:8px}
+    a.link{color:var(--accent);text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2v20'/><path d='M5 7h14'/></svg>" alt="logo">
+      <div>
+        <h1>TOBE Playground — write, run, and share TOBE scripts</h1>
+        <div class="hint">Interpreter in JavaScript (runtime emulation). No server needed — runs in your browser.</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:700">Editor</div>
+            <div class="row">
+              <select id="sampleSelect">
+                <option value="">Open sample...</option>
+                <option value="basic">Basic demo</option>
+                <option value="loops">Loops & conditionals</option>
+                <option value="io">Input / Output</option>
+                <option value="full">Full feature test</option>
+              </select>
+              <button id="loadSample" class="ghost">Load</button>
+            </div>
+          </div>
+          <textarea id="editor">// --- Variable assignments ---
+x = 5
+y = 10
+name as "Alice"
+
+// arithmetic & say
+say "Arithmetic tests:", x, "+", y, "=", x + y
+say "Multiplication:", x, "*", y, "=", x * y
+say "Modulo:", y, "%", x, "=", y % x
+
+// take input
+// take user_input "Enter your name"
+// say "Hello", user_input
+
+// loops
+say "Loop from 1 to 3:"
+loop i from 1 to 3
+    say "Iteration:", i
+
+// while-style
+j = 0
+say "While-style loop until j < 3"
+loop j < 3
+    say "j =", j
+    j += 1
+
+// conditionals
+check x < y
+    say "Check block: x is less than y"
+else
+    say "Else block: x is not less than y"
+
+// nested check
+check x == 5
+    say "x is exactly 5"
+    check y == 10
+        say "and y is exactly 10 too!"
+    else
+        say "but y is not 10"
+else
+    say "x is not 5"
+</textarea>
+
+          <div class="controls">
+            <button id="runBtn">Run</button>
+            <button id="clearOutput" class="ghost">Clear Output</button>
+            <button id="download" class="ghost">Download .tb</button>
+            <button id="copy" class="ghost">Copy</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div style="font-weight:700">Output</div>
+          <pre id="output"></pre>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div style="font-weight:700;margin-bottom:8px">Documentation (quick)</div>
+          <div class="doc">
+            <div class="section">
+              <strong>Variables:</strong> <code>x = 5</code> or <code>name as "Alice"</code>
+            </div>
+            <div class="section">
+              <strong>Say:</strong> <code>say "hello", name, x + 2</code>
+            </div>
+            <div class="section">
+              <strong>Input:</strong> <code>take var "prompt"</code>
+            </div>
+            <div class="section">
+              <strong>Loops:</strong> <code>loop i from 1 to 3</code> or <code>loop j &lt; 3</code>
+            </div>
+            <div class="section">
+              <strong>Conditionals:</strong> <code>check a &lt; b</code> then indented block; optional <code>else</code> at same indent.
+            </div>
+            <div class="section">
+              <strong>Notes:</strong> Indentation defines blocks (use tabs/spaces). String literals use double quotes.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div style="font-weight:700;margin-bottom:8px">Samples</div>
+          <div class="sample-list">
+            <button class="ghost" data-sample="basic">Basic demo</button>
+            <button class="ghost" data-sample="loops">Loops & conditionals</button>
+            <button class="ghost" data-sample="io">Input / Output</button>
+            <button class="ghost" data-sample="full">Full test program</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div style="font-weight:700;margin-bottom:8px">About</div>
+          <div class="doc">This playground emulates the TOBE interpreter in JavaScript for quick experimentation. It aims to match the language features used by the C interpreter (except functions). Use it to prototype scripts before running them with the C interpreter.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">TOBE Playground — offline JS interpreter • Download .tb and run with your native interpreter</div>
+  </div>
+
+  <script>
+    // Simple TOBE interpreter in JavaScript
+    // Supports: variables (int & string), assignments, as, +=, -=, say, take (prompt), loops, check/else, indentation blocks
+
+    function createState() {
+      return { vars: {} };
+    }
+
+    function isNumberStr(s) { return /^-?\d+$/.test(s); }
+
+    function getVar(state, name) {
+      if (state.vars.hasOwnProperty(name)) return state.vars[name];
+      return undefined;
+    }
+
+    function setVar(state, name, value) {
+      state.vars[name] = value;
+    }
+
+    function evalExpr(state, expr) {
+      expr = expr.trim();
+      // simple binary: a op b
+      const m = expr.match(/^([^\s]+)\s*([+\-*/%])\s*([^\s]+)$/);
+      if (m) {
+        const a = tokenValue(state, m[1]);
+        const b = tokenValue(state, m[3]);
+        switch (m[2]) {
+          case '+': return (Number(a) || 0) + (Number(b) || 0);
+          case '-': return (Number(a) || 0) - (Number(b) || 0);
+          case '*': return (Number(a) || 0) * (Number(b) || 0);
+          case '/': return b != 0 ? Math.floor(a / b) : 0;
+          case '%': return b != 0 ? (a % b) : 0;
+        }
+      }
+      // single token: var or int
+      return Number(tokenValue(state, expr)) || 0;
+    }
+
+    function tokenValue(state, token) {
+      token = token.trim();
+      if (token.startsWith('"') && token.endsWith('"')) return token.slice(1,-1);
+      if (isNumberStr(token)) return Number(token);
+      const v = getVar(state, token);
+      if (v === undefined) return 0;
+      return v;
+    }
+
+    function evaluateCondition(state, expr) {
+      expr = expr.trim();
+      const m = expr.match(/^([^\s]+)\s*(==|!=|<=|>=|<|>)\s*([^\s]+)$/);
+      if (!m) return false;
+      const a = tokenValue(state, m[1]);
+      const b = tokenValue(state, m[3]);
+      switch (m[2]) {
+        case '==': return String(a) === String(b);
+        case '!=': return String(a) !== String(b);
+        case '<': return Number(a) < Number(b);
+        case '>': return Number(a) > Number(b);
+        case '<=': return Number(a) <= Number(b);
+        case '>=': return Number(a) >= Number(b);
+      }
+      return false;
+    }
+
+    function parseLines(text) {
+      const raw = text.replace(/\r\n/g,'\n').split('\n');
+      return raw.map((l,i) => ({ text: l, raw: l, ln: i+1 }));
+    }
+
+    function runScript(text, io) {
+      const lines = parseLines(text);
+      const state = createState();
+      const output = [];
+
+      function print(...args) { output.push(args.join(' ')); }
+
+      function promptInput(prompt) {
+        const val = window.prompt(prompt) || '';
+        return val;
+      }
+
+      // helper to get indentation
+      function indent(line) {
+        let i = 0; while (i < line.length && (line[i] === ' ' || line[i] === '\t')) i++; return i;
+      }
+
+      // executor for a block between [start, end)
+      function execBlock(start, end, baseIndent) {
+        for (let i = start; i < end; ++i) {
+          const raw = lines[i].raw;
+          if (raw.trim().length === 0) continue;
+          const ind = indent(raw);
+          if (ind < baseIndent) { /* outside block */ return i; }
+          const line = raw.slice(ind).trim();
+          i = execLine(i, line, ind, baseIndent) || i;
+        }
+        return end;
+      }
+
+      function findBlockBounds(startIndex, baseIndent) {
+        let j = startIndex + 1;
+        while (j < lines.length && (lines[j].raw.trim() === '' || indent(lines[j].raw) > baseIndent)) j++;
+        return { start: startIndex+1, end: j };
+      }
+
+      function execLine(index, line, ind, currentBase) {
+        // statements
+        if (line.startsWith('//') || line.trim() === '') return index;
+        if (line.startsWith('say')) {
+          // parse comma separated args
+          const args = splitByComma(line.slice(3));
+          const parts = args.map(a => {
+            a = a.trim();
+            if (a.startsWith('"') && a.endsWith('"')) return a.slice(1,-1);
+            if (a.match(/^[^\s]+\s*[+\-*/%]\s*[^\s]+$/)) return String(evalExpr(state,a));
+            const v = getVar(state, a);
+            return v === undefined ? a : String(v);
+          });
+          print(parts.join(' '));
+          return index;
+        }
+        if (line.startsWith('take')) {
+          // take var "prompt"
+          const m = line.match(/^take\s+([^\s]+)\s+"([^"]*)"/);
+          if (m) {
+            const varname = m[1];
+            const prompt = m[2];
+            const val = promptInput(prompt);
+            setVar(state, varname, val);
+          }
+          return index;
+        }
+        if (line.startsWith('loop')) {
+          const header = line.slice(4).trim();
+          const bounds = findBlockBounds(index, ind);
+          // for-style
+          let m = header.match(/^([^\s]+)\s+from\s+([^\s]+)\s+to\s+([^\s]+)$/);
+          if (m) {
+            const varname = m[1];
+            const a = evalExpr(state, m[2]);
+            const b = evalExpr(state, m[3]);
+            const step = a <= b ? 1 : -1;
+            for (let v = a; step==1 ? v <= b : v >= b; v += step) {
+              setVar(state, varname, String(v));
+              execBlock(bounds.start, bounds.end, ind);
+            }
+            return bounds.end - 1;
+          }
+          // while-style: var op expr  e.g. j < 3
+          m = header.match(/^([^\s]+)\s*(==|!=|<=|>=|<|>)\s*(.+)$/);
+          if (m) {
+            const varname = m[1];
+            const op = m[2];
+            const expr = m[3];
+            let guard = 200000;
+            while (guard--) {
+              const lhs = tokenValue(state, varname);
+              const rhs = evalExpr(state, expr);
+              if (!compare(lhs, op, rhs)) break;
+              execBlock(bounds.start, bounds.end, ind);
+            }
+            return bounds.end - 1;
+          }
+          return index;
+        }
+        if (line.startsWith('check')) {
+          const expr = line.slice(5).trim();
+          const cond = evaluateCondition(state, expr);
+          // compute check block bounds
+          const bounds = findBlockBounds(index, ind);
+          // find else at same indent after block
+          let elseIndex = bounds.end;
+          while (elseIndex < lines.length && lines[elseIndex].raw.trim() === '') elseIndex++;
+          let hasElse = false;
+          if (elseIndex < lines.length && indent(lines[elseIndex].raw) === ind && lines[elseIndex].raw.trim().startsWith('else')) {
+            hasElse = true;
+            // else block bounds
+            const elseBounds = findBlockBounds(elseIndex, ind);
+            if (cond) {
+              execBlock(bounds.start, bounds.end, ind);
+              return elseBounds.end - 1;
+            } else {
+              execBlock(elseBounds.start, elseBounds.end, ind);
+              return elseBounds.end - 1;
+            }
+          } else {
+            if (cond) execBlock(bounds.start, bounds.end, ind);
+            return bounds.end - 1;
+          }
+        }
+        // assignment
+        // += and -=
+        const mPlus = line.match(/^([^\s]+)\s*\+=\s*(.+)$/);
+        if (mPlus) {
+          const name = mPlus[1];
+          const val = evalExpr(state, mPlus[2]);
+          const cur = Number(tokenValue(state, name)) || 0;
+          setVar(state, name, String(cur + val));
+          return index;
+        }
+        const mMinus = line.match(/^([^\s]+)\s*-=\s*(.+)$/);
+        if (mMinus) {
+          const name = mMinus[1];
+          const val = evalExpr(state, mMinus[2]);
+          const cur = Number(tokenValue(state, name)) || 0;
+          setVar(state, name, String(cur - val));
+          return index;
+        }
+        const mAs = line.match(/^([^\s]+)\s+as\s+\"([^\"]*)\"$/);
+        if (mAs) {
+          setVar(state, mAs[1], mAs[2]);
+          return index;
+        }
+        const mEq = line.match(/^([^\s]+)\s*=\s*(.+)$/);
+        if (mEq) {
+          const name = mEq[1];
+          const rhs = mEq[2];
+          if (/^\".*\"$/.test(rhs.trim())) {
+            setVar(state, name, rhs.trim().slice(1,-1));
+          } else {
+            const val = evalExpr(state, rhs);
+            setVar(state, name, String(val));
+          }
+          return index;
+        }
+
+        // unknown
+        return index;
+      }
+
+      function splitByComma(s) {
+        const parts = [];
+        let cur = '';
+        let inQuote = false;
+        for (let ch of s) {
+          if (ch === '"') inQuote = !inQuote;
+          if (ch === ',' && !inQuote) { parts.push(cur); cur = ''; } else cur += ch;
+        }
+        if (cur.length) parts.push(cur);
+        return parts.map(x => x.trim()).filter(x=>x.length>0);
+      }
+
+      function compare(lhs, op, rhs) {
+        const a = Number(lhs);
+        const b = Number(rhs);
+        switch (op) {
+          case '==': return a === b;
+          case '!=': return a !== b;
+          case '<': return a < b;
+          case '>': return a > b;
+          case '<=': return a <= b;
+          case '>=': return a >= b;
+        }
+        return false;
+      }
+
+      // start executing top-level
+      for (let i = 0; i < lines.length; ++i) {
+        const raw = lines[i].raw;
+        if (raw.trim() === '' || raw.trim().startsWith('//')) continue;
+        const ind = indent(raw);
+        if (ind > 0) continue; // ignore stray indented lines at top-level
+        const line = raw.trim();
+        if (line.startsWith('loop')) {
+          i = execLine(i, line, 0, 0) || i;
+        } else if (line.startsWith('check') || line.startsWith('else')) {
+          i = execLine(i, line, 0, 0) || i;
+        } else {
+          execLine(i, line, 0, 0);
+        }
+      }
+
+      return { output: output.join('\n'), state };
+    }
+
+    // DOM wiring
+    const editor = document.getElementById('editor');
+    const runBtn = document.getElementById('runBtn');
+    const outputEl = document.getElementById('output');
+    const clearBtn = document.getElementById('clearOutput');
+    const downloadBtn = document.getElementById('download');
+    const copyBtn = document.getElementById('copy');
+    const sampleSelect = document.getElementById('sampleSelect');
+    const loadSampleBtn = document.getElementById('loadSample');
+
+    const samples = {
+      basic: `// Basic demo\nx = 5\ny = 10\nsay "Sum:", x + y`,
+      loops: `// loops and conditionals\nx = 1\nloop i from 1 to 3\n    say "i=", i\n\nj = 0\nloop j < 3\n    say "j=", j\n    j += 1\n\ncheck x < 5\n    say "x is small"\nelse\n    say "x is big"`,
+      io: `// Input and output\ntake name "Your name"\nsay "Hello", name`,
+      full: `// Full test\nx = 5\ny = 10\nname as "Alice"\nsay "Arithmetic:", x, "+", y, "=", x + y\n\n// loops\nloop i from 1 to 3\n    say "Iteration:", i\n\n// check/else\ncheck x == 5\n    say "x is 5"\nelse\n    say "x is not 5"`
+    };
+
+    document.querySelectorAll('.sample-list button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-sample');
+        editor.value = samples[key] || '';
+      });
+    });
+
+    loadSampleBtn.addEventListener('click', () => {
+      const v = sampleSelect.value;
+      if (v && samples[v]) editor.value = samples[v];
+    });
+
+    runBtn.addEventListener('click', () => {
+      try {
+        const res = runScript(editor.value, {});
+        outputEl.textContent = res.output;
+      } catch (e) {
+        outputEl.textContent = 'Error: ' + e.message;
+      }
+    });
+
+    clearBtn.addEventListener('click', () => { outputEl.textContent = ''; });
+
+    downloadBtn.addEventListener('click', () => {
+      const blob = new Blob([editor.value], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'script.tb'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    copyBtn.addEventListener('click', () => { navigator.clipboard.writeText(editor.value); });
+
+  </script>
+</body>
+</html>
